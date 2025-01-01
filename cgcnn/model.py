@@ -124,7 +124,7 @@ class CrystalGraphConvNet(nn.Module):
             self.logsoftmax = nn.LogSoftmax(dim=1)
             self.dropout = nn.Dropout()
 
-    def forward(self, atom_fea, nbr_fea, Conc, Time nbr_fea_idx, crystal_atom_idx):
+    def forward(self, atom_fea, nbr_fea, Conc, Time, nbr_fea_idx, crystal_atom_idx):
         """
         Forward pass
 
