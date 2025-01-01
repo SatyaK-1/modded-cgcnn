@@ -131,6 +131,8 @@ def collate_pool(dataset_list):
     batch_atom_fea, batch_nbr_fea, batch_nbr_fea_idx = [], [], []
     crystal_atom_idx, batch_target = [], []
     batch_cif_ids = []
+    Time = []
+    Conc = []
     base_idx = 0
     for i, ((atom_fea, nbr_fea, nbr_fea_idx), target, cif_id)\
             in enumerate(dataset_list):
