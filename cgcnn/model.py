@@ -79,7 +79,7 @@ class CrystalGraphConvNet(nn.Module):
     Create a crystal graph convolutional neural network for predicting total
     material properties.
     """
-    def __init__(self, orig_atom_fea_len, nbr_fea_len,
+    def __init__(self, orig_atom_fea_len, nbr_fea_len, ConcLen, TimeLen,
                  atom_fea_len=64, n_conv=3, h_fea_len=128, n_h=1,
                  classification=False):
         """
@@ -105,7 +105,10 @@ class CrystalGraphConvNet(nn.Module):
         self.classification = classification
         self.embedding = nn.Linear(orig_atom_fea_len, atom_fea_len)
         self.convs = nn.ModuleList([ConvLayer(atom_fea_len=atom_fea_len,
-                                    nbr_fea_len=nbr_fea_len)
+                                    nbr_fea_len=nbr_fea_len,
+                                             Conc = ConcLen,
+                                            Time = TimeLen)
+
                                     for _ in range(n_conv)])
         self.conv_to_fc = nn.Linear(atom_fea_len, h_fea_len)
         self.conv_to_fc_softplus = nn.Softplus()
@@ -122,7 +125,7 @@ class CrystalGraphConvNet(nn.Module):
             self.logsoftmax = nn.LogSoftmax(dim=1)
             self.dropout = nn.Dropout()
 
-    def forward(self, atom_fea, nbr_fea, nbr_fea_idx, crystal_atom_idx):
+    def forward(self, atom_fea, nbr_fea, Conc, Time nbr_fea_idx, crystal_atom_idx):
         """
         Forward pass
 
@@ -151,7 +154,7 @@ class CrystalGraphConvNet(nn.Module):
         """
         atom_fea = self.embedding(atom_fea)
         for conv_func in self.convs:
-            atom_fea = conv_func(atom_fea, nbr_fea, nbr_fea_idx)
+            atom_fea = conv_func(atom_fea, nbr_fea, Conc, Time, nbr_fea_idx)
         crys_fea = self.pooling(atom_fea, crystal_atom_idx)
         crys_fea = self.conv_to_fc(self.conv_to_fc_softplus(crys_fea))
         crys_fea = self.conv_to_fc_softplus(crys_fea)
