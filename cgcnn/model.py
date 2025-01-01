@@ -31,7 +31,7 @@ class ConvLayer(nn.Module):
         self.bn2 = nn.BatchNorm1d(self.atom_fea_len)
         self.softplus2 = nn.Softplus()
 
-    def forward(self, atom_in_fea, nbr_fea, nbr_fea_idx):
+    def forward(self, atom_in_fea, nbr_fea, nbr_fea_idx, Time, Conc):
         """
         Forward pass
 
@@ -55,7 +55,6 @@ class ConvLayer(nn.Module):
           Atom hidden features after convolution
 
         """
-        # TODO will there be problems with the index zero padding?
         N, M = nbr_fea_idx.shape
         # convolution
         atom_nbr_fea = atom_in_fea[nbr_fea_idx, :]
@@ -70,7 +69,7 @@ class ConvLayer(nn.Module):
         nbr_core = self.softplus1(nbr_core)
         nbr_sumed = torch.sum(nbr_filter * nbr_core, dim=1)
         nbr_sumed = self.bn2(nbr_sumed)
-        out = self.softplus2(atom_in_fea + nbr_sumed)
+        out = self.softplus2(atom_in_fea + nbr_sumed + Time + Conc)
         return out
 
 
